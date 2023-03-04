@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+. $1/lemonrc
+set -u
+
+
+free -h -s $RAM_UPDATE | awk '/Mem/ {printf "R%s\n", $3; fflush()}'

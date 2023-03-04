@@ -1,0 +1,78 @@
+#terminal emulator
+alt + Return
+	alacritty
+
+#open browser
+alt + c
+	firefox
+
+#restart sxhkd
+alt + s
+	killall sxhkd ; sxhkd &
+
+#suspend
+F9
+    xset dpms force suspend
+
+#run dialog
+alt + d
+	rofi -show drun
+
+
+##MEDIA KEYS##
+#raise/lower volume
+{XF86AudioRaiseVolume, XF86AudioLowerVolume}
+	pactl set-sink-volume @DEFAULT_SINK@ {+,-}5% && barvolumetrigger
+
+#toggle mute
+XF86AudioMute
+	pactl set-sink-mute @DEFAULT_SINK@ toggle && barvolumetrigger
+
+#toggle microphone mute
+XF86AudioMicMute 
+	pactl set-source-mute @DEFAULT_SOURCE@ toggle	
+
+
+##BSPWM##
+#restart
+alt + shift + r
+	bspc wm --restart
+
+#quit bspwm
+alt + shift + q
+	bspc quit 
+
+#select node/swap node
+alt + {_,shift} + {j,k,l,semicolon}
+	bspc node {--focus,--swap} {west,south,north,east}
+
+#set a node's state
+alt + {space,f}
+	bspc node --state ~{floating,fullscreen} 
+
+#cycle between the monocle and tiled layout
+alt + m
+	bspc desktop --layout next
+
+#select desktop N/send (a node) to desktop N
+alt + {_,shift} + {1-9,0}
+	bspc {desktop --focus,node --to-desktop} ^{1-9,0} --follow 2> /dev/null 
+
+#rotate node
+alt + r
+	bspc node @parent --rotate 90
+
+#horizontal/vertical split
+alt + {h,v}
+    bspc node -p ~{east,south}
+
+#resize node
+alt + ctrl + {j,k,l,semicolon}
+	n=20; \
+	{ \
+	dx=-$n ; dy=0 ; d1=left ; d2=right; , \
+	dx=0 ; dy=$n ; d1=bottom ; d2=top; , \
+	dx=0 ; dy=-$n ; d1=bottom ; d2=top; , \
+	dx=$n ; dy=0 ; d1=left ; d2=right; \
+	} \
+	bspc node --resize $d1 $dx $dy || bspc node --resize $d2 $dx $dy

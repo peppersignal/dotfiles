@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+trap 'trap - TERM; pkill -P $$' TERM INT QUIT EXIT
+
+cwd=$(dirname "$0")
+
+. ${cwd}/lemonrc
+. ${cwd}/panel_profile
+
+
+if [[ -n "$(xdo id -a $PANEL_NAME)" ]]; then 
+	printf "error: A lemonbar instance is already running\n" >&2
+	exit 1
+fi
+
+#Create named pipe
+[[ -e $PANEL_FIFO ]] && rm $PANEL_FIFO
+mkfifo $PANEL_FIFO
+
+${cwd}/modules/pulseaudio_m ${cwd} > $PANEL_FIFO &
+${cwd}/modules/desktops_m ${cwd} > $PANEL_FIFO &
+${cwd}/modules/xtitle_m ${cwd} > $PANEL_FIFO &
+${cwd}/modules/clock_m ${cwd} > $PANEL_FIFO &
+${cwd}/modules/ram_m ${cwd} > $PANEL_FIFO &
+
+#set lemonbar's output (-o)
+[[ $panel_display = "all" ]] && panel_display=
+
+${cwd}/main ${cwd} < $PANEL_FIFO | lemonbar \
+${panel_display:+ -o $panel_display} \
+-n $PANEL_NAME \
+-f "$FONTTEXT" \
+-f "$FONTICONS" \
+-B "$BG" \
+-g "$DIMENSIONS" \
+-u "$UNDERLINE_WIDTH" \
+-U "$UNDERLINE_COLOR" \
+| sh &
+
+#https://github.com/baskerville/bspwm/blob/master/examples/panel/panel#L21
+targets=( $(xdo id -N Bspwm -n root | sort) )
+wids=( $(xdo id -m -a $PANEL_NAME | sort) )
+
+for i in ${!targets[@]}; do
+    xdo above -t "${targets[$i]}" "${wids[$i]}"
+done
+
+wait
+

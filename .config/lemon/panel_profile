@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+PANEL_FIFO=/tmp/lemonbar_panelfifo
+PANEL_NAME=imalemon
+
+export PANEL_FIFO PANEL_NAME

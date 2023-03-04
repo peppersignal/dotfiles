@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+#lemonrc: panel visuals and whatnot
+
+#modules' refresh rate (seconds)
+RAM_UPDATE=5
+CLOCK_UPDATE=60
+
+#colors
+ORANGE="#fe8019"
+PURPLE="#d3869b"
+GREEN="#b8bb26"
+BLACK="#1d2021"
+GRAY="#928374"
+DGRAY="#504945"
+BLUE="#83a598"
+AQUA="#689d6a"
+RED="#fb4934"
+
+#panel colors
+BG="$BLACK"
+FG_FOCUSED="$GRAY"
+FG_OCCUPIED="$DGRAY"
+FG_ACTIVE="#b507e6"
+FG_FREE=
+FG_URGENT=
+
+#widthxheight+x+y
+DIMENSIONS="x30++"
+
+#underline settings
+UNDERLINE_WIDTH=3
+UNDERLINE_COLOR="$BG"
+
+#fonts
+FONTTEXT="-uw-ttyp0-medium-r-normal--13-120-75-75-c-70-iso10646-1"
+FONTICONS="-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
+
+##module's bias
+#available modules: mdesktops, mxtitle mvolume mram mclock
+left="${mdesktops}"
+center="${mxtitle}"
+right="${mvolume} ${mram} ${mclock}"
+
+#trailing and tailing whitespace relative to the bar
+whitespace=2
+
+#padding around each desktop icon
+dpadding=1
+
+#selective panel display settings (all|<monitor_name>)
+panel_display=all
+
+#workspaces display mode (print_focus_based|print_icon_based|print_underline_based)
+workspaces_mode=print_underline_based
+
+#workspaces icons <icon> -> <icon_color>
+icons=(
+"$BLUE"
+"$ORANGE"
+"$GREEN"
+"$RED"
+"$PURPLE"
+)
+
+
+##inner settings
+
+declare -A desk_icons=()
+declare -A color_icons=()
+
+bspwm_desktops=( $(bspc query -D --names) )
+for i in ${!bspwm_desktops[@]}; do
+    desk_icons["${bspwm_desktops[$i]}"]="${icons[$i]:0:1}"
+    color_icons["${bspwm_desktops[$i]}"]="${icons[$i]#?}"
+done
+
+icon(){
+    ret="${desk_icons[$1]}"
+    color="${color_icons[$1]}"
+    
+    if [[ -z "$2" ]]; then echo -e "%{F${color}}${ret}%{F-}"
+    elif [[ "$2" = "nofg" ]]; then echo -e "${ret}"
+    fi
+}
+
+create_whitespace(){
+    printf -v $1 ' %.0s' $(seq ${!1})
+}
+
+create_whitespace dpadding
+create_whitespace whitespace

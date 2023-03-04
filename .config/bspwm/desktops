@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+
+#---CONFIG---#
+LAYOUT=custom
+DESKTOP_NAMES="I II III IV V"
+#------------#
+
+monitors=( $(xrandr -q | grep -Po "[a-zA-Z0-9_-]+(?=\sconnected)") )
+desks=($DESKTOP_NAMES)
+
+case $LAYOUT in
+	permonitor) #assign desktops/monitors workspaces per screen
+		dpm=$(( ${#desks[@]} / ${#monitors[@]} ))	
+		i=0
+
+		for m in ${monitors[@]}; do
+			arr=${desks[@]:i:$dpm} 
+			bspc monitor $m -d ${arr[*]}
+			
+			i=$(( $i + $dpm ))
+		done
+		;;
+
+	custom)
+		if [[ ${#monitors[@]} = 2 ]]; then
+			bspc monitor ${monitors[0]} -d ${desks[0]}
+			bspc monitor ${monitors[1]} -d ${desks[*]:1} 
+		else
+			bspc monitor ${monitors[0]} -d ${desks[*]}
+		fi
+		;;
+esac
+
+

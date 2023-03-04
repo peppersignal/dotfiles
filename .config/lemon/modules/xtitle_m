@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+. $1/lemonrc
+xtitle -i -s -f "X%s\n"

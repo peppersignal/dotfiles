@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#autostart: start programs once bspwm loads
+shell=$(basename $SHELL)
+
+#sxhkd
+killall -q sxhkd; sxhkd &
+
+#lemonbar panel
+#pgrep -xf "$shell $HOME/.local/bin/runpanel" && kill -USR2 $(!!) || runpanel

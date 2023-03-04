@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+
+while read -r line; do
+    case $line in
+        W*) mdesktops="${line#?}";;
+        X*) mxtitle="${line#?}";;
+        V*) mvolume="${line#?}";;
+        C*) mclock=${line#?} ;;
+        R*) mram="${line#?}";;
+    esac
+    . $1/lemonrc
+    barstring="%{l}${whitespace}${left} %{c}${center} %{r}${right}${whitespace}"
+
+    case $panel_display in
+        all)
+            aux=0
+            for i in $(bspc query -M); do
+                barout="${barout}%{S${aux}}${barstring}"
+                (( aux+=1 ))
+            done
+            ;;
+
+        *)
+            barout="%{Sn${panel_display}}${barstring}"
+            ;;
+    esac
+
+    echo "$barout"
+    unset barout
+done

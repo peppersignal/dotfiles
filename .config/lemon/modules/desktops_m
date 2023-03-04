@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+. $1/lemonrc
+
+clean_input(){
+    IFS=:
+    while read -r line; do
+        while [[ "$line" =~ (W|LT|LM|TT|T=|TF|TP|G)[:space:]? ]]; do
+            line=${line//$BASH_REMATCH}
+        done
+        echo $line
+        
+    done < <(bspc subscribe)
+}
+
+
+print_focus_based(){
+    while read -r items; do
+        unset bar_string
+        set -- $items
+
+        while [[ $# > 0 ]]; do
+            item=$1
+            case $item in 
+                [mM]*)
+                    case $item in
+                        M*) onmonitor=1 ;;
+                        m*) onmonitor=0 ;;
+                    esac
+                    ;;
+
+                [fFoOuU]*)
+                    case $item in
+                        [FO]*)
+                            if [[ $onmonitor = 1 ]]; then
+                                FG=$FG_FOCUSED
+                            else
+                                FG=$FG_ACTIVE
+                            fi
+                            ;;
+
+                        o*) FG=$FG_OCCUPIED ;;
+                        f*) FG=$FG_FREE ;;
+                    esac
+                    deskname=$(icon "${item#?}" nofg)
+                    bar_string="${bar_string}%{T2}%{F${FG}}${dpadding}${deskname}${dpadding}%{F-}%{T-}"
+                    ;;
+            esac
+            shift
+        done
+        echo "W${bar_string}"
+    done
+}
+
+
+print_icon_based(){
+    while read -r items; do
+        unset bar_string
+        set -- $items
+
+        while [[ $# > 0 ]]; do
+            item=$1
+            case $item in
+                [FOU]*) deskname="$(icon "${item#?}")" ;;
+                [ou]*) deskname="%{F${GRAY}}$(icon "${item#?}" nofg)%{F-}" ;;
+                f*) deskname="%{F${GRAY2}}$(icon "${item#?}" nofg)%{F-}" ;;
+                [Mm]*) shift; continue ;;
+            esac
+            bar_string="${bar_string}%{T2}${dpadding}${deskname}${dpadding}%{T-}"
+            shift
+        done
+        echo "W${bar_string}" 
+    done
+}
+
+
+print_underline_based(){
+    while read -r items; do
+        unset bar_string
+        set -- $items
+
+        while [[ $# > 0 ]]; do
+            item=$1
+            case $item in
+                [FOU]*) deskicon="%{U${FG_FOCUSED}}%{+u}${dpadding}$(icon ${item#?})${dpadding}%{-u}%{U-}" ;;
+                [ou]*) deskicon="%{U${FG_OCCUPIED}}%{+u}${dpadding}$(icon ${item#?})${dpadding}%{-u}%{U-}";;
+                f*) deskicon="${dpadding}$(icon ${item#?})${dpadding}" ;;
+                [mM]*) shift; continue ;;
+            esac
+            bar_string="${bar_string}%{T2}${deskicon}%{T-}"
+            shift
+        done
+        echo "W${bar_string}"
+    done
+}
+
+clean_input | $workspaces_mode

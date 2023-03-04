@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+. $1/lemonrc
+
+set -u
+
+while true; do
+    printf "C%s\n" $(date +%R)
+    sleep $CLOCK_UPDATE
+done

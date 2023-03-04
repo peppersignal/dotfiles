@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+
+#---CONFIG---#
+padding=25
+monocle_padding=40
+gaps=15
+#------------#
+
+#desktop assignment
+. $HOME/.config/bspwm/desktops &
+
+#borders
+killall bspc
+. $HOME/.config/bspwm/dualborders &
+
+#padding
+for pos in top right bottom left ; do
+	bspc config ${pos}_padding $padding
+	bspc config ${pos}_monocle_padding $monocle_padding
+done
+
+bspc config focus_follows_pointer true
+bspc config pointer_follows_focus true
+bspc config pointer_modifier mod1
+
+bspc config presel_feedback false
+
+bspc config window_gap $gaps
+
+#autostart
+$HOME/.config/bspwm/autostart &
+
+
+
+
+

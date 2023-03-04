@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+trap trigger USR1
+
+. $1/lemonrc
+
+
+get_volume(){
+    awk -F/ '/Volume/ {gsub("%| ", ""); sum=int(($2+$4)/2); printf "V%%%s\n", sum}' <<< "$(pactl get-sink-volume @DEFAULT_SINK@)"
+}
+
+trigger(){
+    if [[ "$(pactl get-sink-mute @DEFAULT_SINK@)" =~ yes ]]; then
+        echo "Vmuted"
+    else
+        get_volume
+    fi
+
+    pkill -f "sleep infinity"
+    sleep infinity & 
+    wait 
+}
+
+get_volume
+#Hangs indefinitely
+sleep infinity &
+wait 

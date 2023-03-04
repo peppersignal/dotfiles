@@ -1,0 +1,11 @@
+- maim (screenshoot tool)
+- llpp (pdf reader)
+- ranger (file manager)
+- xbindkeys (keynames feature)
+- noto-fonts-cjk (japanese glyphs)
+- noto-fonts (special glyphs in general)
+- uw-ttyp0
+- siji font (bitmap characters)
+- xorg-xfd (look at font characters)
+- xorg-xfontsel (X logical font descriptors -*-*-)
+- xorg-xlsfonts (ls fonts)
